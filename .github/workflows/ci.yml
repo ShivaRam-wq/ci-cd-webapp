@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Step
+        run: |
+          echo "Build started..."
+          echo "Files in repo:"
+          ls -la
+          echo "Build complete!"
+
+      - name: Run Tests
+        run: echo "No tests configured. Skipping..."
+
+      - name: Notify on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_MESSAGE: "✅ Build SUCCESS on branch ${{ github.ref }} by ${{ github.actor }}"
+          SLACK_COLOR: good
+
+      - name: Notify on Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_MESSAGE: "❌ Build FAILED on branch ${{ github.ref }} by ${{ github.actor }}"
+          SLACK_COLOR: danger
